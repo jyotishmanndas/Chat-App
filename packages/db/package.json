@@ -1,0 +1,21 @@
+{
+  "name": "@workspace/db",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "exports":{
+    "./prisma": "./dist/index.js"
+  },
+  "scripts": {
+  "build": "tsc -b"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@prisma/client": "6.13.0",
+    "@types/node": "^20",
+    "prisma": "^6.13.0"
+  }
+}
