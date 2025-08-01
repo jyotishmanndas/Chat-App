@@ -22,3 +22,7 @@ export const signinSchema = z.object({
         .regex(/[0-9]/, { message: "Password must contain at least one number" })
         .regex(/[@#$%&*!?]/, { message: "Password must contain at least one special chacracter" })
 });
+
+export const roomCreateSchema = z.object({
+    slug: z.string().min(1)
+})
