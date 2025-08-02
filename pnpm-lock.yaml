@@ -72,6 +72,9 @@ importers:
       '@workspace/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@workspace/zod-validator':
+        specifier: workspace:*
+        version: link:../../packages/zod
       axios:
         specifier: ^1.11.0
         version: 1.11.0
@@ -115,9 +118,6 @@ importers:
       '@workspace/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
-      '@workspace/zod-validator':
-        specifier: workspace:*
-        version: link:../../packages/zod
       typescript:
         specifier: ^5.7.3
         version: 5.7.3

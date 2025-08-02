@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { signupSchema } from "@workspace/zod-validator/zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@workspace/ui/components/form";
-import { to } from "@workspace/ui/components/sonner"
 import { Input } from "@workspace/ui/components/input";
 import { Button } from "@workspace/ui/components/button";
 import { useState } from "react";
@@ -39,7 +38,7 @@ export function SignUpForm() {
                 localStorage.setItem("token", token);
                 form.reset();
                 toast.success("Signup successful");
-                router.push("/chat");
+                router.push("/dashboard");
             }
         } catch (error) {
             if (axios.isAxiosError(error) && error.response?.status === 400) {

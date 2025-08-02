@@ -37,7 +37,7 @@ export function LoginInForm() {
                 localStorage.setItem("token", token);
                 form.reset();
                 toast.success("Login successful");
-                router.push("/chat");
+                router.push("/dashboard");
             }
         } catch (error) {
             if (axios.isAxiosError(error) && error.response?.status === 400) {
