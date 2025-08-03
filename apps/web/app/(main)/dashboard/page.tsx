@@ -1,6 +1,4 @@
 import { JoinRoomForm } from "@/components/forms/Joinroom-form";
-import { Button } from "@workspace/ui/components/button";
-import { Input } from "@workspace/ui/components/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card"
 
 export default function Dashboard() {
