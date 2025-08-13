@@ -32,7 +32,7 @@ export function JoinRoomForm() {
             });
             form.reset();
             toast.success("Room created successfully");
-            router.push(`/chat/${res.data.createRoom.slug}`)
+            router.push(`/chat/${res.data.slug}`)
         } catch (error) {
             console.log(error);
             toast("Something went wrong")

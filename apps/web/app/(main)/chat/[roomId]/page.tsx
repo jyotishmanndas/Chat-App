@@ -26,7 +26,7 @@ interface User {
 export default function ChatPage() {
     const params = useParams();
     const roomId = params.roomId as string;
-    
+
     const { socket, isConnected } = useWebSocket();
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputMessage, setInputMessage] = useState("");
@@ -55,13 +55,13 @@ export default function ChatPage() {
             try {
                 const data = JSON.parse(event.data);
                 console.log("Received WebSocket message:", data);
-                
+
                 switch (data.type) {
                     case "joined_room":
                         setIsJoined(true);
                         toast.success(`Joined room: ${data.roomId}`);
                         break;
-                    
+
                     case "message":
                         const newMessage: Message = {
                             id: Date.now().toString(),
@@ -72,11 +72,11 @@ export default function ChatPage() {
                         };
                         setMessages(prev => [...prev, newMessage]);
                         break;
-                    
+
                     case "error":
                         toast.error(data.message);
                         break;
-                    
+
                     default:
                         console.log("Unknown message type:", data.type);
                 }
@@ -94,10 +94,10 @@ export default function ChatPage() {
 
     const sendMessage = () => {
         if (!inputMessage.trim() || !socket || !isJoined) {
-            console.log("Cannot send message:", { 
-                hasInput: !!inputMessage.trim(), 
-                hasSocket: !!socket, 
-                isJoined 
+            console.log("Cannot send message:", {
+                hasInput: !!inputMessage.trim(),
+                hasSocket: !!socket,
+                isJoined
             });
             return;
         }
@@ -164,11 +164,10 @@ export default function ChatPage() {
                                         className={`flex ${message.isOwn ? 'justify-end' : 'justify-start'}`}
                                     >
                                         <div
-                                            className={`max-w-xs lg:max-w-md px-3 py-2 rounded-lg ${
-                                                message.isOwn
-                                                    ? 'bg-primary text-primary-foreground'
-                                                    : 'bg-muted'
-                                            }`}
+                                            className={`max-w-xs lg:max-w-md px-3 py-2 rounded-lg ${message.isOwn
+                                                ? 'bg-primary text-primary-foreground'
+                                                : 'bg-muted'
+                                                }`}
                                         >
                                             {/* <div className="text-sm font-medium mb-1">
                                                 {message.userId}
@@ -190,7 +189,7 @@ export default function ChatPage() {
                             onKeyDown={handleKeyDown}
                             disabled={!isJoined}
                         />
-                        <Button 
+                        <Button
                             onClick={sendMessage}
                             disabled={!inputMessage.trim()}
                         >

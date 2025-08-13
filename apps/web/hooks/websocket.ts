@@ -10,7 +10,7 @@ export function useWebSocket() {
             console.error("No authentication token found");
             return;
         }
-        
+
         const socketUrl = new WebSocket(`ws://localhost:8080?token=${token}`);
 
         socketUrl.onopen = () => {
@@ -52,7 +52,7 @@ export async function getCurrentUser() {
             console.error('Invalid token format');
             return null;
         }
-        
+
         const payload = JSON.parse(atob(parts[1]));
         const userId = payload.userId;
 
