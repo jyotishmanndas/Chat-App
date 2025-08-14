@@ -22,7 +22,7 @@ export function SignUpForm() {
         defaultValues: {
             email: "",
             password: "",
-            name: ""
+            name: "",
         },
     });
 
@@ -32,7 +32,7 @@ export function SignUpForm() {
     async function onSubmit(values: z.infer<typeof signupSchema>) {
         try {
             setLoading(true);
-            const res = await axios.post("http://localhost:3000/signup", values);
+            const res = await axios.post("http://localhost:3001/signup", values);
             const token = res.data.token;
             if (token) {
                 localStorage.setItem("token", token);

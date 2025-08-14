@@ -7,7 +7,6 @@ interface User {
     ws: WebSocket
     rooms: string[]
     userId: string
-    text: string[]
 }
 const users: User[] = [];
 
@@ -42,7 +41,6 @@ wss.on('connection', function connection(ws, request) {
         ws,
         rooms: [],
         userId,
-        text: []
     };
     users.push(user);
 
@@ -75,15 +73,16 @@ wss.on('connection', function connection(ws, request) {
                 }
                 case "send_message": {
                     const roomId = message.roomId;
-                    const text = message.text;
+                    const messages = message.message;
 
                     // Send message to all users in the same room (except sender)
                     users.forEach(otherUser => {
-                        if (otherUser.rooms.includes(roomId) && otherUser.userId !== userId) {
+                        if (otherUser.rooms.includes(roomId)) {     //&& otherUser.userId !== userId
                             otherUser.ws.send(JSON.stringify({
                                 type: "message",
-                                text,
-                                roomId
+                                messages,
+                                roomId,
+                                userId
                             }));
                         }
                     });

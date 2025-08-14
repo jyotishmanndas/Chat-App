@@ -95,7 +95,6 @@ export const getUserProfile = async (req: Request, res: Response) => {
                 id: true,
                 name: true,
                 email: true,
-                createdAt: true
             }
         });
 

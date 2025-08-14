@@ -28,5 +28,5 @@ export const roomCreateSchema = z.object({
 });
 
 export const inputSchema = z.object({
-    text: z.string().min(1)
+    message: z.string().min(1)
 })

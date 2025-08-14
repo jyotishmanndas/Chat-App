@@ -25,7 +25,7 @@ export function JoinRoomForm() {
     });
     async function onSubmit(values: z.infer<typeof roomCreateSchema>) {
         try {
-            const res = await axios.post("http://localhost:3000/room/create", values, {
+            const res = await axios.post("http://localhost:3001/room/create", values, {
                 headers: {
                     Authorization: localStorage.getItem("token")
                 }

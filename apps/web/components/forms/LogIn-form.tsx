@@ -31,7 +31,7 @@ export function LoginInForm() {
     async function onSubmit(values: z.infer<typeof signinSchema>) {
         try {
             setLoading(true);
-            const res = await axios.post("http://localhost:3000/signin", values);
+            const res = await axios.post("http://localhost:3001/signin", values);
             const token = res.data.token;
             if (token) {
                 localStorage.setItem("token", token);

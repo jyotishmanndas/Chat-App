@@ -4,7 +4,7 @@ import { useWebSocket } from "@/hooks/websocket";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card"
 import { Input } from "@workspace/ui/components/input"
 import { Button } from "@workspace/ui/components/button"
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
@@ -12,42 +12,98 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { inputSchema } from "@workspace/zod-validator/zod";
 import z from "zod";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@workspace/ui/components/form";
+import { Send } from "lucide-react";
+import axios from "axios";
 
 interface Message {
     id: string;
-    text: string;
+    message: string;
     userId: string;
     roomId: string;
 }
 
 export default function ChatPage() {
-
-    const form = useForm<z.infer<typeof inputSchema>>({
-        resolver: zodResolver(inputSchema),
-        defaultValues: {
-            text: ""
-        },
-    });
-
-    function onSubmit(values: z.infer<typeof inputSchema>) {
-        console.log(values)
-    }
-
-    const params = useParams();
-    const roomId = params.roomId as string;
-
     const { socket, isConnected } = useWebSocket();
     const [messages, setMessages] = useState<Message[]>([]);
+    const [userId, setuserId] = useState("")
+    const params = useParams();
+    const roomId = params.roomId as string;
+    // const router = useRouter();
+    // if (!token) {
+    //     router.push("/signup")
+    // };
+
+    useEffect(() => {
+        const token = localStorage.getItem("token")
+        if (!socket || !isConnected) {
+            return;
+        };
+
+        axios.get("http://localhost:3001/userProfile", {
+            headers: {
+                Authorization: token
+            }
+        })
+            .then((res) => {
+                setuserId(res.data.user.id)
+            })
+
+        axios.get(`http://localhost:3001/chat/roommessage/${roomId}`, {
+            headers: {
+                Authorization: token
+            }
+        }).then((res) => {
+            setMessages(res.data)
+        }).catch((err) => console.error("Failed to fetch room messages:", err));
+
+
+        console.log("WebSocket connected, joining room:", roomId);
+        // Join the room
+        socket.send(JSON.stringify({ type: "join_room", roomId }));
+    }, [socket, isConnected, roomId]);
 
     useEffect(() => {
         if (!socket || !isConnected) {
             return;
         };
 
-        console.log("WebSocket connected, joining room:", roomId);
-        // Join the room
-        socket.send(JSON.stringify({ type: "join_room", roomId }));
-    }, [socket, isConnected, roomId]);
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data)
+
+            if (data.type === "message") {
+                setMessages((prev) => [
+                    ...prev,
+                    {
+                        id: crypto.randomUUID(), // Generate unique id for UI
+                        message: data.message,
+                        userId: data.userId,
+                        roomId: data.roomId
+                    }
+                ]);
+            }
+        }
+    }, [socket, isConnected])
+
+    const form = useForm<z.infer<typeof inputSchema>>({
+        resolver: zodResolver(inputSchema),
+        defaultValues: {
+            message: ""
+        },
+    });
+
+    async function onSubmit(values: z.infer<typeof inputSchema>) {
+        const token = localStorage.getItem("token");
+        try {
+            await axios.post("http://localhost:3001/chat/createmessage", { slug: roomId, message: values.message }, { headers: { Authorization: token } })
+            socket?.send(JSON.stringify({ type: "send_message", message: values.message, roomId }))
+
+            form.reset()
+        } catch (error) {
+            console.log(error);
+            toast.error("failed to send message")
+        }
+    }
+
 
     return (
         <div className="flex items-center justify-center min-h-screen p-4">
@@ -70,6 +126,18 @@ export default function ChatPage() {
                 <CardContent>
                     <div className="w-full h-64 rounded-md border border-neutral-800 p-4 overflow-y-auto bg-background">
                         {/* to diaplay a messages */}
+                        {messages.map((msg) => (
+                            <div
+                                key={msg.id}
+                                className={`mb-2 p-2 rounded-md max-w-xs ${
+                                    msg.userId === userId
+                                        ? "bg-blue-600 text-white ml-auto"
+                                        : "bg-gray-700 text-white"
+                                }`}
+                            >
+                                {msg.message}
+                            </div>
+                        ))}
                     </div>
 
                     <div className="mt-5 w-full">
@@ -77,7 +145,7 @@ export default function ChatPage() {
                             <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-center w-full gap-2">
                                 <FormField
                                     control={form.control}
-                                    name="text"
+                                    name="message"
                                     render={({ field }) => (
                                         <FormItem className="flex-1">
                                             <FormControl>
@@ -87,7 +155,9 @@ export default function ChatPage() {
                                         </FormItem>
                                     )}
                                 />
-                                <Button className="h-9 w-9 rounded-full cursor-pointer" type="submit">S</Button>
+                                <Button className="h-9 w-9 rounded-full cursor-pointer" type="submit">
+                                    <Send className="w-4 h-4" />
+                                </Button>
                             </form>
                         </Form>
                     </div>
