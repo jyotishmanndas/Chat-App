@@ -38,37 +38,3 @@ export function useWebSocket() {
 
     return { socket, isConnected };
 };
-
-export async function getCurrentUser() {
-    const token = localStorage.getItem("token");
-    if (!token) {
-        return null;
-    }
-
-    try {
-        // Decode the JWT to get userId
-        const parts = token.split('.');
-        if (parts.length !== 3 || !parts[1]) {
-            console.error('Invalid token format');
-            return null;
-        }
-
-        const payload = JSON.parse(atob(parts[1]));
-        const userId = payload.userId;
-
-        const response = await fetch(`http://localhost:3000/${userId}`, {
-            headers: {
-                'Authorization': `${token}`
-            }
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            return data.user;
-        }
-    } catch (error) {
-        console.error('Error fetching current user:', error);
-    }
-
-    return null;
-}

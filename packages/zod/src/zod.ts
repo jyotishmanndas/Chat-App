@@ -25,4 +25,8 @@ export const signinSchema = z.object({
 
 export const roomCreateSchema = z.object({
     slug: z.string().min(1)
+});
+
+export const inputSchema = z.object({
+    text: z.string().min(1)
 })

@@ -11,5 +11,5 @@ app.use("/", userRoutes);
 app.use("/room", roomRoutes);
 
 app.listen(3000, () => {
-    console.log("Server is running on the port 3000");
+    console.log("Server is running on the port 3001");
 });
