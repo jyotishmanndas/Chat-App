@@ -50,8 +50,8 @@ wss.on('connection', function connection(ws, request) {
 
             switch (message.type) {
                 case "join_room": {
-                    const roomId = message.roomId;
-                    const user = users.find(user => user.userId === userId);
+                    const roomId = message.roomCode; //payload.roomId
+                    const user = users.find(user => user.ws === ws);
                     if (user && !user.rooms.includes(roomId)) {
                         user.rooms.push(roomId);
                         ws.send(JSON.stringify({ type: "joined_room", roomId }));
@@ -61,8 +61,8 @@ wss.on('connection', function connection(ws, request) {
                     break;
                 };
                 case "leave_room": {
-                    const roomId = message.roomId;
-                    const user = users.find(user => user.userId === userId);
+                    const roomId = message.roomCode;
+                    const user = users.find(user => user.ws === ws);
                     if (user && user.rooms.includes(roomId)) {
                         user.rooms = user.rooms.filter(room => room !== roomId);
                         ws.send(JSON.stringify({ type: "left_room", roomId }));
@@ -72,15 +72,15 @@ wss.on('connection', function connection(ws, request) {
                     break;
                 }
                 case "send_message": {
-                    const roomId = message.roomId;
-                    const messages = message.message;
+                    const roomId = message.roomCode;
+                    const text = message.messageText;
 
                     // Send message to all users in the same room (except sender)
                     users.forEach(otherUser => {
                         if (otherUser.rooms.includes(roomId)) {     //&& otherUser.userId !== userId
                             otherUser.ws.send(JSON.stringify({
                                 type: "message",
-                                messages,
+                                message: text,
                                 roomId,
                                 userId
                             }));

@@ -24,9 +24,9 @@ export const signinSchema = z.object({
 });
 
 export const roomCreateSchema = z.object({
-    slug: z.string().min(1)
+    slug: z.string().min(1).max(6)
 });
 
-export const inputSchema = z.object({
+export const chatInputSchema = z.object({
     message: z.string().min(1)
 })

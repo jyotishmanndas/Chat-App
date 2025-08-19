@@ -28,6 +28,7 @@ export function useWebSocket() {
         socketUrl.onerror = (error) => {
             console.error("WebSocket error:", error);
             setIsConnected(false);
+            socketUrl.close();
         };
 
         return () => {

@@ -25,14 +25,14 @@ export function JoinRoomForm() {
     });
     async function onSubmit(values: z.infer<typeof roomCreateSchema>) {
         try {
-            const res = await axios.post("http://localhost:3001/room/create", values, {
+            const res = await axios.post("http://localhost:3001/room/create", { slug: values.slug }, {
                 headers: {
                     Authorization: localStorage.getItem("token")
                 }
             });
             form.reset();
             toast.success("Room created successfully");
-            router.push(`/chat/${res.data.slug}`)
+            router.push(`/chat/${res.data.room.slug}`)
         } catch (error) {
             console.log(error);
             toast("Something went wrong")
