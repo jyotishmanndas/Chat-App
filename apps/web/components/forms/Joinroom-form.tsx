@@ -6,6 +6,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@workspace/
 import { Input } from "@workspace/ui/components/input";
 import { roomCreateSchema } from "@workspace/zod-validator/zod";
 import axios from "axios";
+import { error } from "console";
 import { Copy, CopyCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -23,21 +24,6 @@ export function JoinRoomForm() {
             slug: ""
         },
     });
-    async function onSubmit(values: z.infer<typeof roomCreateSchema>) {
-        try {
-            const res = await axios.post("http://localhost:3001/room/create", { slug: values.slug }, {
-                headers: {
-                    Authorization: localStorage.getItem("token")
-                }
-            });
-            form.reset();
-            toast.success("Room created successfully");
-            router.push(`/chat/${res.data.room.slug}`)
-        } catch (error) {
-            console.log(error);
-            toast("Something went wrong")
-        }
-    };
 
     const randomRoomId = () => {
         const values = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890";
@@ -57,6 +43,30 @@ export function JoinRoomForm() {
             setToogle(false)
         }, 2000)
     };
+
+    async function onSubmit(values: z.infer<typeof roomCreateSchema>) {
+        const token = localStorage.getItem("token")
+        try {
+            const res = await axios.get(`http://localhost:3001/room/joinroom/${values.slug}`, { headers: { Authorization: token } })
+            form.reset();
+            toast.success("Room joined successfully");
+            router.push(`/chat/${res.data.room.slug}`)
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response?.status === 404) {
+                try {
+                    const res = await axios.post("http://localhost:3001/room/create", values, { headers: { Authorization: token } })
+                    form.reset();
+                    toast.success("Room created successfully");
+                    router.push(`/chat/${res.data.room.slug}`)
+                } catch (error) {
+                    toast.error("Failed to create room");
+                }
+            } else {
+                toast.error("Something went wrong");
+            }
+        }
+    };
+
     return (
         <>
             <Form {...form}>

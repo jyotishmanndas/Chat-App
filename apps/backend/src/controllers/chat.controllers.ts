@@ -1,5 +1,5 @@
 import { prisma } from "@workspace/db/prisma";
-import { inputSchema } from "@workspace/zod-validator/zod";
+import { chatInputSchema } from "@workspace/zod-validator/zod";
 import { Request, Response } from "express";
 
 export const ChatMessage = async (req: Request, res: Response) => {

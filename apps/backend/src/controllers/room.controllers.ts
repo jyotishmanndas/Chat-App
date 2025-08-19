@@ -12,8 +12,6 @@ export const roomCreate = async (req: Request, res: Response) => {
             return res.status(400).json({ msg: "User not found" })
         };
 
-        console.log(req.body.slug);
-
         const existingRoom = await prisma.room.findFirst({
             where: { slug: req.body.slug }
         })
@@ -22,7 +20,6 @@ export const roomCreate = async (req: Request, res: Response) => {
             return res.status(401).json({ msg: "This room is already exists" })
         }
         const result = roomCreateSchema.safeParse(req.body);
-        console.log(result);
 
         if (!result.success) {
             return res.status(400).json({ msg: "Invalid room data" })
@@ -42,7 +39,35 @@ export const roomCreate = async (req: Request, res: Response) => {
                 cretedAt: createRoom.createdAt
             }
         })
+    } catch (error) {
+        return res.status(500).json({ msg: "Interal server error" })
+    }
+};
 
+export const joinRoom = async (req: Request, res: Response) => {
+    try {
+        const profileCheck = await prisma.user.findUnique({
+            where: { id: req.userId }
+        });
+
+        if (!profileCheck) {
+            return res.status(400).json({ msg: "User not found" })
+        };
+
+        const room = await prisma.room.findFirst({
+            where: { slug: req.params.id }
+        });
+
+        if (!room) {
+            return res.status(404).json({ msg: "No such room is found" })
+        };
+
+        return res.status(200).json({
+            room: {
+                id: room.id,
+                slug: room.slug
+            }
+        })
     } catch (error) {
         return res.status(500).json({ msg: "Interal server error" })
     }
