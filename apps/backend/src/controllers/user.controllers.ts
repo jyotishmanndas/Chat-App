@@ -7,9 +7,7 @@ import bcrypt from "bcryptjs";
 export const userSignUp = async (req: Request, res: Response) => {
     const result = signupSchema.safeParse(req.body);
     if (!result.success) {
-        return res.status(400).json({
-            msg: "Invalid inputs"
-        })
+        return res.status(400).json({ msg: "Invalid inputs" })
     };
 
     try {
@@ -19,9 +17,7 @@ export const userSignUp = async (req: Request, res: Response) => {
             }
         });
         if (existingUser) {
-            return res.status(400).json({
-                msg: "user already exists with this email"
-            })
+            return res.status(400).json({ msg: "user already exists with this email" })
         };
 
         const hashedPassword = await bcrypt.hash(result.data.password, 12);
@@ -41,18 +37,14 @@ export const userSignUp = async (req: Request, res: Response) => {
             msg: "user created successfully"
         })
     } catch (error) {
-        return res.status(500).json({
-            msg: "Internal server error"
-        })
+        return res.status(500).json({ msg: "Internal server error" })
     }
 };
 
 export const userSignIn = async (req: Request, res: Response) => {
     const result = signinSchema.safeParse(req.body);
     if (!result.success) {
-        return res.status(400).json({
-            msg: "Invalid inputs"
-        })
+        return res.status(400).json({ msg: "Invalid inputs" })
     };
 
     try {
@@ -62,16 +54,12 @@ export const userSignIn = async (req: Request, res: Response) => {
             }
         });
         if (!existingUser) {
-            return res.status(400).json({
-                msg: "user does not exist with this email"
-            })
+            return res.status(400).json({ msg: "user does not exist with this email" })
         };
 
         const isPasswordValid = await bcrypt.compare(result.data.password, existingUser.password);
         if (!isPasswordValid) {
-            return res.status(400).json({
-                msg: "Invalid password"
-            })
+            return res.status(400).json({ msg: "Invalid password" })
         };
 
         const userId = existingUser.id;
@@ -81,9 +69,7 @@ export const userSignIn = async (req: Request, res: Response) => {
             msg: "User signup successfully"
         });
     } catch (error) {
-        return res.status(500).json({
-            msg: "Internal server error"
-        });
+        return res.status(500).json({ msg: "Internal server error" });
     }
 };
 
@@ -99,9 +85,7 @@ export const getUserProfile = async (req: Request, res: Response) => {
         });
 
         if (!user) {
-            return res.status(404).json({
-                msg: "User not found"
-            });
+            return res.status(404).json({ msg: "User not found" });
         };
 
         return res.status(200).json({
@@ -109,8 +93,6 @@ export const getUserProfile = async (req: Request, res: Response) => {
             msg: "User found successfully"
         });
     } catch (error) {
-        return res.status(500).json({
-            msg: "Internal server error"
-        });
+        return res.status(500).json({ msg: "Internal server error" });
     }
 };

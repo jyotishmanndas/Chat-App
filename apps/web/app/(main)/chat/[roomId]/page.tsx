@@ -43,13 +43,13 @@ export default function ChatPage() {
                 setuserId(res.data.user.id)
             })
 
-        // axios.get(`http://localhost:3001/chat/roommessage/${roomId}`, {
-        //     headers: {
-        //         Authorization: token
-        //     }
-        // }).then((res) => {
-        //     setMessages(res.data)
-        // }).catch((err) => console.error("Failed to fetch room messages:", err));
+        axios.get(`http://localhost:3001/chat/roommessage/${roomId}`, {
+            headers: {
+                Authorization: token
+            }
+        }).then((res) => {
+            setMessages(res.data)
+        }).catch((err) => console.error("Failed to fetch room messages:", err));
 
         console.log("WebSocket connected, joining room:", roomId);
         socket.send(JSON.stringify({ type: "join_room", roomCode: roomId }));
@@ -79,12 +79,12 @@ export default function ChatPage() {
     });
 
     async function onSubmit(values: z.infer<typeof chatInputSchema>) {
-        // const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
         if (!socket || !isConnected) {
             return
         }
         try {
-            // await axios.post("http://localhost:3001/chat/createmessage", { slug: roomId, message: values.message }, { headers: { Authorization: token } })
+            await axios.post("http://localhost:3001/chat/createmessage", { slug: roomId, message: values.message }, { headers: { Authorization: token } })
             socket.send(JSON.stringify({ type: "send_message", messageText: values.message, roomCode: roomId }))
             form.reset()
         } catch (error) {
@@ -115,7 +115,7 @@ export default function ChatPage() {
                     <div className="w-full h-64 rounded-md border border-neutral-800 p-4 overflow-y-auto bg-background">
                         {messages.map((msg) => (
                             <div
-                                // key={msg.roomId}
+                                key={msg.message}
                                 className={`mb-2 p-2 rounded-md max-w-xs ${msg.userId === userId
                                     ? "bg-blue-600 text-white ml-auto"
                                     : "bg-gray-700 text-white"
