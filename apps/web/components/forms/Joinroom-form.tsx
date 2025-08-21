@@ -48,18 +48,26 @@ export function JoinRoomForm() {
         const token = localStorage.getItem("token")
         try {
             const res = await axios.get(`http://localhost:3001/room/joinroom/${values.slug}`, { headers: { Authorization: token } })
-            form.reset();
-            toast.success("Room joined successfully");
-            router.push(`/chat/${res.data.room.slug}`)
+            if (res.status === 200) {
+                form.reset();
+                toast.success("Room joined successfully");
+                router.push(`/chat/${res.data.room.slug}`)
+            }
         } catch (error) {
             if (axios.isAxiosError(error) && error.response?.status === 404) {
                 try {
                     const res = await axios.post("http://localhost:3001/room/create", values, { headers: { Authorization: token } })
-                    form.reset();
-                    toast.success("Room created successfully");
-                    router.push(`/chat/${res.data.room.slug}`)
+                    if (res.status === 200) {
+                        form.reset();
+                        toast.success("Room created successfully");
+                        router.push(`/chat/${res.data.room.slug}`)
+                    }
                 } catch (error) {
-                    toast.error("Failed to create room");
+                    if (axios.isAxiosError(error) && error.response?.status === 409) {
+                        toast.error("This room is already exists")
+                    } else {
+                        toast.error("Failed to create room");
+                    }
                 }
             } else {
                 toast.error("Something went wrong");

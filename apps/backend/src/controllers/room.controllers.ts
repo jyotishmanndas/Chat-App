@@ -17,7 +17,7 @@ export const roomCreate = async (req: Request, res: Response) => {
         })
 
         if (existingRoom) {
-            return res.status(401).json({ msg: "This room is already exists" })
+            return res.status(409).json({ msg: "This room is already exists" })
         }
         const result = roomCreateSchema.safeParse(req.body);
 
@@ -59,12 +59,12 @@ export const joinRoom = async (req: Request, res: Response) => {
         };
 
         const room = await prisma.room.findUnique({
-            where: { slug: req.params.id },
+            where: { slug: req.body.slug },
             include: { members: true }
         });
 
         if (!room) {
-            return res.status(404).json({ msg: "No such room is found" })
+            return res.status(404).json({ msg: "No such room found" })
         };
 
         const isMember = room.members.some(m => m.userId === profileCheck.id);
@@ -76,8 +76,7 @@ export const joinRoom = async (req: Request, res: Response) => {
                     roomId: room.id
                 }
             })
-        }
-
+        };
         return res.status(200).json({
             room: {
                 id: room.id,

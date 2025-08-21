@@ -8,7 +8,7 @@ export const ChatMessage = async (req: Request, res: Response) => {
             where: { id: req.userId }
         })
         if (!profile) {
-            return res.status(400).json({ msg: "user not found" })
+            return res.status(404).json({ msg: "user not found" })
         };
 
         const room = await prisma.room.findUnique({
@@ -16,7 +16,7 @@ export const ChatMessage = async (req: Request, res: Response) => {
             include: { members: true }
         })
         if (!room) {
-            return res.status(400).json({ msg: "Room not found" })
+            return res.status(404).json({ msg: "Room not found" })
         }
 
         // const result = chatInputSchema.safeParse(req.body);
@@ -48,15 +48,15 @@ export const getRoomMessage = async (req: Request, res: Response) => {
             where: { id: req.userId }
         })
         if (!profile) {
-            return res.status(400).json({ msg: "user not found" })
+            return res.status(404).json({ msg: "user not found" })
         };
 
-        const room = await prisma.room.findFirst({
+        const room = await prisma.room.findUnique({
             where: { slug: req.params.id },
             include: { members: true }
         });
         if (!room) {
-            return res.status(401).json({ msg: "room not found" })
+            return res.status(404).json({ msg: "room not found" })
         };
 
         const member = room.members.find(m => m.userId === profile.id);

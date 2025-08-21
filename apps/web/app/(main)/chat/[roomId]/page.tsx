@@ -4,6 +4,7 @@ import { useWebSocket } from "@/hooks/websocket";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card"
 import { Input } from "@workspace/ui/components/input"
 import { Button } from "@workspace/ui/components/button"
+// import { ScrollArea } from "@workspace/ui/components/scroll-area"
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
@@ -30,29 +31,28 @@ export default function ChatPage() {
 
     useEffect(() => {
         const token = localStorage.getItem("token")
-        if (!socket || !isConnected) {
-            return;
-        };
+        if (!socket || !isConnected || !token) return;
 
         axios.get("http://localhost:3001/userProfile", {
-            headers: {
-                Authorization: token
-            }
+            headers: { Authorization: token }
         })
-            .then((res) => {
-                setuserId(res.data.user.id)
-            })
+            .then((res) => setuserId(res.data.user.id))
+            .catch(() => toast.error("Failed to load profile. Please login again."));
 
         axios.get(`http://localhost:3001/chat/roommessage/${roomId}`, {
-            headers: {
-                Authorization: token
-            }
-        }).then((res) => {
-            setMessages(res.data)
-        }).catch((err) => console.error("Failed to fetch room messages:", err));
+            headers: { Authorization: token }
+        })
+            .then((res) => setMessages(res.data))
+            .catch(() => toast.error("Failed to fetch room messages."));
 
-        console.log("WebSocket connected, joining room:", roomId);
-        socket.send(JSON.stringify({ type: "join_room", roomCode: roomId }));
+        try {
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ type: "join_room", roomCode: roomId }));
+            }
+        } catch (error) {
+            toast.error("Failed to join chat room.");
+        }
+
     }, [socket, isConnected, roomId]);
 
     useEffect(() => {
@@ -80,16 +80,18 @@ export default function ChatPage() {
 
     async function onSubmit(values: z.infer<typeof chatInputSchema>) {
         const token = localStorage.getItem("token");
-        if (!socket || !isConnected) {
-            return
-        }
+        if (!socket || !isConnected || !token) return;
+
         try {
             await axios.post("http://localhost:3001/chat/createmessage", { slug: roomId, message: values.message }, { headers: { Authorization: token } })
-            socket.send(JSON.stringify({ type: "send_message", messageText: values.message, roomCode: roomId }))
+
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ type: "send_message", messageText: values.message, roomCode: roomId }));
+            }
             form.reset()
         } catch (error) {
             console.log(error);
-            toast.error("failed to send message")
+            toast.error("Failed to send message");
         }
     }
 
@@ -107,12 +109,17 @@ export default function ChatPage() {
                     <div className="flex items-center w-full h-14 bg-accent mt-4 rounded-md">
                         <div className="flex items-start justify-center px-5 py-2">
                             <p className="text-muted-foreground font-light">ROOM CODE: </p>
-                            <span className="text-muted-foreground font-light ml-1">{roomId}</span>
+                            <span className="text-muted-foreground font-semibold ml-1">{roomId}</span>
                         </div>
                     </div>
                 </CardHeader>
                 <CardContent>
                     <div className="w-full h-64 rounded-md border border-neutral-800 p-4 overflow-y-auto bg-background">
+                        {messages.length === 0 && (
+                            <div className="flex items-center justify-center h-full">
+                                No conversation
+                            </div>
+                        )}
                         {messages.map((msg) => (
                             <div
                                 key={msg.message}
