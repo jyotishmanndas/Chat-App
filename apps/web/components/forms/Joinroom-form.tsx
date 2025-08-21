@@ -85,7 +85,7 @@ export function JoinRoomForm() {
                         render={({ field }) => (
                             <FormItem>
                                 <FormControl>
-                                    <Input className="w-84" placeholder="shadcn" {...field} />
+                                    <Input className="w-84" placeholder="Enter roomId" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

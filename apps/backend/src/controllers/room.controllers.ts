@@ -59,7 +59,7 @@ export const joinRoom = async (req: Request, res: Response) => {
         };
 
         const room = await prisma.room.findUnique({
-            where: { slug: req.body.slug },
+            where: { slug: req.params.id },
             include: { members: true }
         });
 

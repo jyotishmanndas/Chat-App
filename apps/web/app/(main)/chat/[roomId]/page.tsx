@@ -4,7 +4,6 @@ import { useWebSocket } from "@/hooks/websocket";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card"
 import { Input } from "@workspace/ui/components/input"
 import { Button } from "@workspace/ui/components/button"
-// import { ScrollArea } from "@workspace/ui/components/scroll-area"
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
@@ -13,7 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { chatInputSchema } from "@workspace/zod-validator/zod";
 import z from "zod";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@workspace/ui/components/form";
-import { Send } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 import axios from "axios";
 
 interface Message {
@@ -95,6 +94,8 @@ export default function ChatPage() {
         }
     }
 
+    const { isValid } = form.formState
+
     return (
         <div className="flex items-center justify-center min-h-screen p-4">
             <Card className="w-full max-w-2xl">
@@ -117,13 +118,13 @@ export default function ChatPage() {
                     <div className="w-full h-64 rounded-md border border-neutral-800 p-4 overflow-y-auto bg-background">
                         {messages.length === 0 && (
                             <div className="flex items-center justify-center h-full">
-                                No conversation
+                                <span className="text-muted-foreground">No messages yet</span>
                             </div>
                         )}
                         {messages.map((msg) => (
                             <div
                                 key={msg.message}
-                                className={`mb-2 p-2 rounded-md max-w-xs ${msg.userId === userId
+                                className={`mb-2 p-2 rounded-md max-w-fit ${msg.userId === userId
                                     ? "bg-blue-600 text-white ml-auto"
                                     : "bg-gray-700 text-white"
                                     }`}
@@ -147,8 +148,8 @@ export default function ChatPage() {
                                         </FormItem>
                                     )}
                                 />
-                                <Button className="h-9 w-9 rounded-full cursor-pointer" type="submit">
-                                    <Send className="w-4 h-4" />
+                                <Button className="h-9 w-9 rounded-full cursor-pointer" type="submit" disabled={!isValid}>
+                                    <ArrowUp className="w-4 h-4" />
                                 </Button>
                             </form>
                         </Form>
