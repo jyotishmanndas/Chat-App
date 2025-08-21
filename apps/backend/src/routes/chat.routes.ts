@@ -1,10 +1,10 @@
-import { Router } from "express";
-import { authMiddleware } from "../middleware/jwtAuth";
-import { ChatMessage, getRoomMessage } from "../controllers/chat.controllers";
+// import { Router } from "express";
+// import { authMiddleware } from "../middleware/jwtAuth";
+// import { ChatMessage, getRoomMessage } from "../controllers/chat.controllers";
 
-const router: Router = Router();
+// const router: Router = Router();
 
-router.post("/createmessage", authMiddleware, ChatMessage);
-router.get("/roommessage/:id", authMiddleware, getRoomMessage)
+// router.post("/createmessage", authMiddleware, ChatMessage);
+// router.get("/roommessage/:id", authMiddleware, getRoomMessage)
 
-export default router
+// export default router

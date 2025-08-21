@@ -12,7 +12,7 @@ export const roomCreate = async (req: Request, res: Response) => {
             return res.status(400).json({ msg: "User not found" })
         };
 
-        const existingRoom = await prisma.room.findFirst({
+        const existingRoom = await prisma.room.findUnique({
             where: { slug: req.body.slug }
         })
 
@@ -25,18 +25,22 @@ export const roomCreate = async (req: Request, res: Response) => {
             return res.status(400).json({ msg: "Invalid room data" })
         };
 
-        const userId = req.userId;
         const createRoom = await prisma.room.create({
             data: {
                 slug: result.data.slug,
-                userId: userId || ""
+                userId: profileCheck.id,
+                members: {
+                    create: [
+                        { userId: profileCheck.id }
+                    ]
+                }
             }
         });
         return res.status(200).json({
             msg: "Room created successfully", room: {
                 id: createRoom.id,
                 slug: createRoom.slug,
-                cretedAt: createRoom.createdAt
+                createdAt: createRoom.createdAt
             }
         })
     } catch (error) {
@@ -54,13 +58,25 @@ export const joinRoom = async (req: Request, res: Response) => {
             return res.status(400).json({ msg: "User not found" })
         };
 
-        const room = await prisma.room.findFirst({
-            where: { slug: req.params.id }
+        const room = await prisma.room.findUnique({
+            where: { slug: req.params.id },
+            include: { members: true }
         });
 
         if (!room) {
             return res.status(404).json({ msg: "No such room is found" })
         };
+
+        const isMember = room.members.some(m => m.userId === profileCheck.id);
+
+        if (!isMember) {
+            await prisma.roomMembers.create({
+                data: {
+                    userId: profileCheck.id,
+                    roomId: room.id
+                }
+            })
+        }
 
         return res.status(200).json({
             room: {

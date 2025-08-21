@@ -16,15 +16,15 @@ import { Send } from "lucide-react";
 import axios from "axios";
 
 interface Message {
-    message: string;
-    userId: string;
-    roomId: string;
+    message: string
+    userId: string
+    roomId: string
 }
 
 export default function ChatPage() {
     const { socket, isConnected } = useWebSocket();
     const [messages, setMessages] = useState<Message[]>([]);
-    const [userId, setuserId] = useState("")
+    const [userId, setuserId] = useState("");
     const params = useParams();
     const roomId = params.roomId as string;
 
